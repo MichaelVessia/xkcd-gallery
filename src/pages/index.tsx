@@ -46,7 +46,7 @@ const Home: NextPage = () => {
             {allComics?.data?.pages.map((page) => (
               <Fragment key={page.num}>
                 {page.comics.map((comic) => (
-                  <ComicCard comic={comic} />
+                  <ComicCard key={comic?.num} comic={comic} />
                 ))}
               </Fragment>
             ))}
