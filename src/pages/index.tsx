@@ -65,7 +65,11 @@ const ComicCard = (props: ComicCardProps) => {
   if (!props.comic) return null;
   return (
     <section className="flex flex-col p-6 mt-8 duration-500 border-2 border-gray-500 rounded shadow-xl motion-safe:hover:scale-105">
-      <a href={`https://xkcd.com/${props.comic.num}`} target="_blank">
+      <a
+        href={`https://xkcd.com/${props.comic.num}`}
+        target="_blank"
+        rel="noreferrer"
+      >
         <h2 className="text-xl text-gray-700">{props.comic.title}</h2>
         <img className="mx-auto max-h-[250px]" src={props.comic.img} />
         <p className="text-sm text-gray-600">{props.comic.alt}</p>
