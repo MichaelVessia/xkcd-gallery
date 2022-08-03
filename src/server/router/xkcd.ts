@@ -26,9 +26,9 @@ export const xkcdRouter = createRouter()
       cursor: z.number().nullish(),
     }),
     async resolve({ input }) {
-      const comics = await fetchComics(input.cursor || 1, input.limit || 50);
+      const comics = await fetchComics(input.cursor, input.limit || 50);
       let lastComic = comics.pop();
-      let nextCursor = lastComic!.num + 1;
+      let nextCursor = lastComic!.num - 1;
       return {
         comics: [...comics, lastComic],
         num: nextCursor,
@@ -43,12 +43,19 @@ const fetchCurrentComic = async (): Promise<Comic> => {
 };
 
 const fetchComics = async (
-  comicId: number,
+  comicId: number | null | undefined,
   limit: number
 ): Promise<Comic[]> => {
   const requests = [];
-  // TODO: Get current comic id and decrement rather than increment
-  for (let i = comicId; i < comicId + limit; i++) {
+  let start;
+  if (!comicId) {
+    // TODO: Does this automatically get cached by react-query, or do I need to manually cache it?
+    const currentComic = await fetchCurrentComic();
+    start = currentComic.num;
+  } else {
+    start = comicId;
+  }
+  for (let i = start; i > 0 && i > start - limit; i--) {
     requests.push(() => fetch(`https://xkcd.com/${i}/info.0.json`));
   }
 

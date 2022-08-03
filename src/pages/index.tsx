@@ -11,7 +11,6 @@ type TechnologyCardProps = {
 };
 
 const Home: NextPage = () => {
-  const currentComic = trpc.useQuery(["xkcd.currentComic"]);
   const allComics = trpc.useInfiniteQuery(["xkcd.allComics", { limit: 10 }], {
     getNextPageParam: (lastPage) => lastPage.num,
   });
@@ -38,9 +37,6 @@ const Home: NextPage = () => {
       </Head>
 
       <main className="container flex flex-col p-4">
-        <>
-          <ComicCard comic={currentComic.data} />
-        </>
         <div className="grid gap-3 pt-3 text-center grid-cols-4">
           <>
             {allComics?.data?.pages.map((page) => (
