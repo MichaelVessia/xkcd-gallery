@@ -1,5 +1,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
+import { Fragment, useEffect, useRef } from "react";
 import { Comic } from "../server/router/xkcd";
 import { trpc } from "../utils/trpc";
 
@@ -11,7 +12,23 @@ type TechnologyCardProps = {
 
 const Home: NextPage = () => {
   const currentComic = trpc.useQuery(["xkcd.currentComic"]);
-  const currentComicNum = currentComic?.data?.num;
+  const allComics = trpc.useInfiniteQuery(["xkcd.allComics", { limit: 10 }], {
+    getNextPageParam: (lastPage) => lastPage.num,
+  });
+
+  function handleScroll() {
+    if (
+      window.innerHeight + document.documentElement.scrollTop !==
+      document.documentElement.offsetHeight
+    )
+      return;
+    allComics.fetchNextPage();
+  }
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <>
@@ -20,35 +37,20 @@ const Home: NextPage = () => {
         <meta name="description" content="browse all of the xkcd comics" />
       </Head>
 
-      <main className="container flex flex-col min-h-screen p-4">
-        <div>{currentComicNum}</div>
-        <div className="grid gap-3 pt-3 text-center grid-cols-6">
-          {currentComic.data ? (
-            <>
-              <ComicCard comic={currentComic.data} />
-              <ComicCard comic={currentComic.data} />
-              <ComicCard comic={currentComic.data} />
-              <ComicCard comic={currentComic.data} />
-              <ComicCard comic={currentComic.data} />
-              <ComicCard comic={currentComic.data} />
-              <ComicCard comic={currentComic.data} />
-              <ComicCard comic={currentComic.data} />
-              <ComicCard comic={currentComic.data} />
-              <ComicCard comic={currentComic.data} />
-              <ComicCard comic={currentComic.data} />
-              <ComicCard comic={currentComic.data} />
-              <ComicCard comic={currentComic.data} />
-              <ComicCard comic={currentComic.data} />
-              <ComicCard comic={currentComic.data} />
-              <ComicCard comic={currentComic.data} />
-              <ComicCard comic={currentComic.data} />
-              <ComicCard comic={currentComic.data} />
-              <ComicCard comic={currentComic.data} />
-              <ComicCard comic={currentComic.data} />
-            </>
-          ) : (
-            <p>Loading..</p>
-          )}
+      <main className="container flex flex-col p-4">
+        <>
+          <ComicCard comic={currentComic.data} />
+        </>
+        <div className="grid gap-3 pt-3 text-center grid-cols-4">
+          <>
+            {allComics?.data?.pages.map((page) => (
+              <Fragment key={page.num}>
+                {page.comics.map((comic) => (
+                  <ComicCard comic={comic} />
+                ))}
+              </Fragment>
+            ))}
+          </>
         </div>
       </main>
     </>
@@ -56,15 +58,16 @@ const Home: NextPage = () => {
 };
 
 type ComicCardProps = {
-  comic: Comic;
+  comic?: Comic;
 };
 
-const ComicCard: React.VFC<ComicCardProps> = (props) => {
+const ComicCard = (props: ComicCardProps) => {
+  if (!props.comic) return null;
   return (
-    <section className="flex flex-col p-6 duration-500 border-2 border-gray-500 rounded shadow-xl motion-safe:hover:scale-105">
+    <section className="flex flex-col p-6 mt-8 duration-500 border-2 border-gray-500 rounded shadow-xl motion-safe:hover:scale-105">
       <a href={`https://xkcd.com/${props.comic.num}`} target="_blank">
         <h2 className="text-xl text-gray-700">{props.comic.title}</h2>
-        <img src={props.comic.img} />
+        <img className="mx-auto max-h-[250px]" src={props.comic.img} />
         <p className="text-sm text-gray-600">{props.comic.alt}</p>
       </a>
     </section>
