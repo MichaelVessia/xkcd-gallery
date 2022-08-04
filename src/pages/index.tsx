@@ -30,8 +30,8 @@ const Home: NextPage = () => {
         <meta name="description" content="browse all of the xkcd comics" />
       </Head>
 
-      <main className="container flex flex-col p-4">
-        <div className="grid gap-3 pt-3 text-center grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <main className="flex flex-col justify-center p-4">
+        <div className="grid gap-4 pt-3 text-center grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
           <>
             {allComics?.data?.pages.map((page) => (
               <Fragment key={page.num}>
@@ -57,7 +57,7 @@ type ComicCardProps = {
 const ComicCard = (props: ComicCardProps) => {
   if (!props.comic) return null;
   return (
-    <section className="flex flex-col p-6 pb-2 mt-8 duration-500 border-2 border-gray-500 rounded shadow-xl motion-safe:hover:scale-105">
+    <section className="flex flex-col p-6 pb-2 m-2 duration-500 border-2 border-gray-500 rounded shadow-xl motion-safe:hover:scale-105">
       <a
         className="pb-4"
         href={`https://xkcd.com/${props.comic.num}`}
