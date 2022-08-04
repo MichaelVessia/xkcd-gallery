@@ -12,7 +12,7 @@ const Home: NextPage = () => {
 
   // Ref for the element that we want to detect whether on screen
   const ref: any = useRef<HTMLDivElement>();
-  const onScreen: boolean = useOnScreen<HTMLDivElement>(ref);
+  const onScreen: boolean = useOnScreen<HTMLDivElement>(ref, "-1px");
 
   useEffect(() => {
     if (onScreen) {
