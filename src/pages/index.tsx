@@ -3,25 +3,22 @@ import Head from "next/head";
 import { Fragment, useEffect, useRef } from "react";
 import type { Comic } from "../server/router/xkcd";
 import { trpc } from "../utils/trpc";
+import useOnScreen from "../utils/useOnScreen";
 
 const Home: NextPage = () => {
   const allComics = trpc.useInfiniteQuery(["xkcd.allComics", { limit: 10 }], {
     getNextPageParam: (lastPage) => lastPage.num,
   });
 
-  function handleScroll() {
-    if (
-      window.innerHeight + document.documentElement.scrollTop !==
-      document.documentElement.offsetHeight
-    )
-      return;
-    allComics.fetchNextPage();
-  }
+  // Ref for the element that we want to detect whether on screen
+  const ref: any = useRef<HTMLDivElement>();
+  const onScreen: boolean = useOnScreen<HTMLDivElement>(ref);
 
   useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    if (onScreen) {
+      allComics.fetchNextPage();
+    }
+  }, [onScreen, allComics.isLoading]);
 
   return (
     <>
@@ -41,7 +38,7 @@ const Home: NextPage = () => {
               </Fragment>
             ))}
           </>
-          <button onClick={() => allComics.fetchNextPage()}>
+          <button ref={ref} onClick={() => allComics.fetchNextPage()}>
             Click to load more...
           </button>
         </div>
