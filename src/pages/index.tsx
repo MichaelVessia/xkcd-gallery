@@ -1,14 +1,8 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import { Fragment, useEffect, useRef } from "react";
-import { Comic } from "../server/router/xkcd";
+import type { Comic } from "../server/router/xkcd";
 import { trpc } from "../utils/trpc";
-
-type TechnologyCardProps = {
-  name: string;
-  description: string;
-  documentation: string;
-};
 
 const Home: NextPage = () => {
   const allComics = trpc.useInfiniteQuery(["xkcd.allComics", { limit: 10 }], {
@@ -47,6 +41,9 @@ const Home: NextPage = () => {
               </Fragment>
             ))}
           </>
+          <button onClick={() => allComics.fetchNextPage()}>
+            Click to load more...
+          </button>
         </div>
       </main>
     </>
@@ -60,16 +57,25 @@ type ComicCardProps = {
 const ComicCard = (props: ComicCardProps) => {
   if (!props.comic) return null;
   return (
-    <section className="flex flex-col p-6 mt-8 duration-500 border-2 border-gray-500 rounded shadow-xl motion-safe:hover:scale-105">
+    <section className="flex flex-col p-6 pb-2 mt-8 duration-500 border-2 border-gray-500 rounded shadow-xl motion-safe:hover:scale-105">
       <a
+        className="pb-4"
         href={`https://xkcd.com/${props.comic.num}`}
         target="_blank"
         rel="noreferrer"
       >
-        <h2 className="text-xl text-gray-700">{props.comic.title}</h2>
-        <img className="mx-auto max-h-[250px]" src={props.comic.img} />
-        <p className="text-sm text-gray-600">{props.comic.alt}</p>
+        <h2 className="text-xl text-gray-700 pb-2">{props.comic.title}</h2>
+        <img
+          className="mx-auto max-h-[250px]"
+          src={props.comic.img}
+          alt={props.comic.alt}
+          title={props.comic.alt}
+        />
       </a>
+      <div className="flex flex-row justify-between mt-auto">
+        <div className="text-xs text-gray-500">#{props.comic.num}</div>
+        <div className="text-xs text-gray-500">{`${props.comic.month}/${props.comic.day}/${props.comic.year}`}</div>
+      </div>
     </section>
   );
 };
