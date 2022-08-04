@@ -31,7 +31,7 @@ const Home: NextPage = () => {
       </Head>
 
       <main className="container flex flex-col p-4">
-        <div className="grid gap-3 pt-3 text-center grid-cols-4">
+        <div className="grid gap-3 pt-3 text-center grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           <>
             {allComics?.data?.pages.map((page) => (
               <Fragment key={page.num}>
